@@ -55,6 +55,7 @@ const initialFormState: FormData = {
   lastName: '',
   dateOfBirth: '',
   email: '',
+  emailAddress: '',
   phoneNumber: '',
   sentCode: '',
   approvedOTP: '',
