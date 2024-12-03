@@ -219,8 +219,7 @@ export default function Home() {
         setSubmitError('Please enter a valid pickup address.');
         return;
       }
-    }
-    if (step === 8) {
+
       const pickupphoneRegex = /^\+?[1-9]\d{1,14}$/;
       let pickupdigitCount = formData.pickupPhoneNumber.replace(/\D/g, "").length;
 
@@ -864,6 +863,11 @@ export default function Home() {
     return (
       <>
         <h2 className="text-lg font-medium text-gray-900">Schedule Your Admission</h2>
+        {formData.travelArrangements === 'No' && submitMessage && (
+          <div className={`mt-4 mb-6 p-4 ${submitMessage.type === 'success' ? 'text-green-700 border-green-700 bg-green-50' : 'text-red-700 border-red-700 bg-red-50'} border-l-4`}>
+            <p className="font-medium">{submitMessage.text}</p>
+          </div>
+        )}
         <p className="mt-1 text-sm text-gray-600">Can you make travel arrangements to arrive at the facility at this time?</p>
         <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
           <div className="sm:col-span-6">
