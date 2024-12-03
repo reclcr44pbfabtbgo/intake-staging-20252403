@@ -118,6 +118,7 @@ export default function Home() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
+  const [triggerMessage, settriggerMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
   const [vobMessage, setVOBMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
 
 
@@ -203,32 +204,24 @@ export default function Home() {
       const phoneRegex = /^\+?[1-9]\d{1,14}$/;
       let digitCount = formData.phoneNumber.replace(/\D/g, "").length;
 
-      if (!phoneRegex.test(formData.phoneNumber)) {
-        setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
-        return;
-      }
-      if (digitCount === 10) { } else {
+      if (!phoneRegex.test(formData.phoneNumber) || digitCount > 10) {
         setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
         return;
       }
     }
     
     if (step === 8 && formData.travelArrangements === 'No') {
+      const phoneRegex = /^\+?[1-9]\d{1,14}$/;
       const addressPattern = /[A-Za-z].*\d|\d.*[A-Za-z]/;
       if (!addressPattern.test(formData.pickupAddress.trim())) {
         setSubmitError('Please enter a valid pickup address.');
         return;
       }
 
-      const pickupphoneRegex = /^\+?[1-9]\d{1,14}$/;
       let pickupdigitCount = formData.pickupPhoneNumber.replace(/\D/g, "").length;
 
-      if (!pickupphoneRegex.test(formData.pickupPhoneNumber)) {
-        setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
-        return;
-      }
-      if (pickupdigitCount === 10) { } else {
-        setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
+      if (!phoneRegex.test(formData.pickupPhoneNumber) || pickupdigitCount > 10 ) {
+        settriggerMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
         return;
       }
     }
@@ -863,9 +856,9 @@ export default function Home() {
     return (
       <>
         <h2 className="text-lg font-medium text-gray-900">Schedule Your Admission</h2>
-        {formData.travelArrangements === 'No' && submitMessage && (
-          <div className={`mt-4 mb-6 p-4 ${submitMessage.type === 'success' ? 'text-green-700 border-green-700 bg-green-50' : 'text-red-700 border-red-700 bg-red-50'} border-l-4`}>
-            <p className="font-medium">{submitMessage.text}</p>
+        {formData.travelArrangements === 'No' && triggerMessage && formData.pickupPhoneNumber && (
+          <div className={`mt-4 mb-6 p-4 ${triggerMessage.type === 'success' ? 'text-green-700 border-green-700 bg-green-50' : 'text-red-700 border-red-700 bg-red-50'} border-l-4`}>
+            <p className="font-medium">{triggerMessage.text}</p>
           </div>
         )}
         <p className="mt-1 text-sm text-gray-600">Can you make travel arrangements to arrive at the facility at this time?</p>
