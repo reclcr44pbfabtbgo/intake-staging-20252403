@@ -13,9 +13,6 @@ interface FormData {
   email: string;
   emailAddress: string;
   phoneNumber: string;
-  sentCode: string;
-  approvedOTP: string;
-  OTPCode: string;
   treatmentType: string;
   primaryIssue: string;
   usedLast30Days: string;
@@ -57,9 +54,6 @@ const initialFormState: FormData = {
   email: '',
   emailAddress: '',
   phoneNumber: '',
-  sentCode: '',
-  approvedOTP: '',
-  OTPCode: '',
   treatmentType: '',
   primaryIssue: '',
   usedLast30Days: 'Yes',
@@ -126,54 +120,6 @@ export default function Home() {
   const [submitMessage, setSubmitMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
   const [vobMessage, setVOBMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
 
-  
-  const OTPPhoneNumber = formData.phoneNumber;
-  const OTPCode = formData.OTPCode;
-
-  const sendOtp = async () => {
-    try {
-        const response = await fetch('/api/send-otp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ OTPPhoneNumber }),
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          setFormData(prevState => ({ ...prevState, sentCode: 'sent' }));
-          setSubmitMessage({ type: 'success', text: 'OTP sent successfully!' });
-        } else {
-            setSubmitMessage({ type: 'error', text: `Error: ${data.error}` });
-            setFormData(prevState => ({ ...prevState, sentCode: '' }));
-        }
-    } catch (error) {
-        setSubmitMessage({ type: 'error', text: `Error: ${error.message}` });
-        setFormData(prevState => ({ ...prevState, sentCode: '' }));
-    }
-  };
-
-  const verifyOtp = async () => {
-      try {
-          const response = await fetch('/api/verify-otp', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ OTPPhoneNumber, OTPCode }),
-          });
-
-          const data = await response.json();
-
-          if (data.status === 'approved') {
-            setFormData(prevState => ({ ...prevState, approvedOTP: 'approved' }));
-            setSubmitMessage({ type: 'success', text: 'Phone number verified successfully!' });
-          } else {
-            setFormData(prevState => ({ ...prevState, approvedOTP: '' }));
-            setSubmitMessage({ type: 'error', text: 'Invalid OTP. Please try again.' });
-          }
-      } catch (error) {
-        setFormData(prevState => ({ ...prevState, approvedOTP: '' }));
-        setSubmitMessage({ type: 'error', text: error.message });
-      }
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -220,7 +166,7 @@ export default function Home() {
   const validateStep = (currentStep: number): boolean => {
     switch (currentStep) {
       case 1:
-        return !!formData.insuranceProvider && !!formData.policyNumber && !!formData.phoneNumber && !!formData.emailAddress && !!formData.approvedOTP;
+        return !!formData.insuranceProvider && !!formData.policyNumber && !!formData.phoneNumber && !!formData.emailAddress;
       case 2:
         return !!formData.email && !!formData.treatmentType && !!formData.primaryIssue;
       case 3:
@@ -255,12 +201,14 @@ export default function Home() {
     
     if (step === 1) {
       const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-      if (!phoneRegex.test(formData.phoneNumber) && formData.OTPCode) {
+      let digitCount = formData.phoneNumber.replace(/\D/g, "").length;
+
+      if (!phoneRegex.test(formData.phoneNumber)) {
         setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
         return;
       }
-      if (!formData.approvedOTP && formData.phoneNumber && !formData.OTPCode) {
-        setSubmitMessage({ type: 'error', text: 'Verify OTP first.' });
+      if (digitCount === 10) { } else {
+        setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
         return;
       }
     }
@@ -501,27 +449,8 @@ export default function Home() {
                 onChange={handleChange}
                 className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
               />
-              <button className="pos-abs text-white rounded-md px-6 top-0 right-0 height-100p bg-accent" onClick={sendOtp}>Send OTP</button>
             </div>
           </div>
-          {formData.sentCode === 'sent' && (
-            <div className="sm:col-span-3">
-              <label htmlFor="OTPCode" className="block text-sm font-medium text-gray-800">
-                OTP Code
-              </label>
-              <div className="mt-1 pos-rel">
-                <input
-                  type="text"
-                  name="OTPCode"
-                  id="OTPCode"
-                  value={formData.OTPCode || ''}
-                  onChange={handleChange}
-                  className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
-                />
-                <button className="pos-abs text-white rounded-md px-6 top-0 right-0 height-100p bg-accent" onClick={verifyOtp}>Verify OTP</button>
-              </div>
-            </div>
-          )}
 
           <div className="sm:col-span-3">
             <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-800">
@@ -554,13 +483,6 @@ export default function Home() {
             />
           </div>
         )}
-        <input
-        type="hidden"
-        name="approvedOTP"
-        id="approvedOTP"
-        value={formData.approvedOTP || ''}
-        onChange={handleChange}
-        />
       </>
     );
   };
