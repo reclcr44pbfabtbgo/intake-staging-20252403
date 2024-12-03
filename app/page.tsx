@@ -209,7 +209,6 @@ export default function Home() {
       }
       if (digitCount === 10) { } else {
         setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
-        return;
       }
     }
     
@@ -218,6 +217,18 @@ export default function Home() {
       if (!addressPattern.test(formData.pickupAddress.trim())) {
         setSubmitError('Please enter a valid pickup address.');
         return;
+      }
+    }
+    if (step === 8) {
+      const pickupphoneRegex = /^\+?[1-9]\d{1,14}$/;
+      let pickupdigitCount = formData.pickupPhoneNumber.replace(/\D/g, "").length;
+
+      if (!pickupphoneRegex.test(formData.pickupPhoneNumber)) {
+        setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
+        return;
+      }
+      if (pickupdigitCount === 10) { } else {
+        setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
       }
     }
 
