@@ -225,11 +225,11 @@ export default function Home() {
       let pickupdigitCount = formData.pickupPhoneNumber.replace(/\D/g, "").length;
 
       if (!pickupphoneRegex.test(formData.pickupPhoneNumber)) {
-        setSubmitError('Invalid phone number format. Use E.164 format, e.g., +1234567890.');
+        setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
         return;
       }
       if (pickupdigitCount === 10) { } else {
-        setSubmitError('Invalid phone number format. Use E.164 format, e.g., +1234567890.');
+        setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
         return;
       }
     }
