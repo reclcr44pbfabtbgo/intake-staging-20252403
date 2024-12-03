@@ -856,9 +856,9 @@ export default function Home() {
     return (
       <>
         <h2 className="text-lg font-medium text-gray-900">Schedule Your Admission</h2>
-        {formData.travelArrangements === 'No' && triggerMessage && formData.pickupPhoneNumber && (
-          <div className={`mt-4 mb-6 p-4 ${triggerMessage.type === 'success' ? 'text-green-700 border-green-700 bg-green-50' : 'text-red-700 border-red-700 bg-red-50'} border-l-4`}>
-            <p className="font-medium">{triggerMessage.text}</p>
+        {formData.travelArrangements === 'No' && settriggerMessage && formData.pickupPhoneNumber && (
+          <div className={`mt-4 mb-6 p-4 ${settriggerMessage.type === 'success' ? 'text-green-700 border-green-700 bg-green-50' : 'text-red-700 border-red-700 bg-red-50'} border-l-4`}>
+            <p className="font-medium">{settriggerMessage.text}</p>
           </div>
         )}
         <p className="mt-1 text-sm text-gray-600">Can you make travel arrangements to arrive at the facility at this time?</p>
