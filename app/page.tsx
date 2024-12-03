@@ -231,7 +231,6 @@ export default function Home() {
         setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
       }
     }
-
     if (validateStep(step)) {
       if (step < 5) {
         setStep(step + 1);
