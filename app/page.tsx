@@ -974,7 +974,6 @@ export default function Home() {
                   value={formData.pickupTime}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
-                  min={minTimeString}
                   required
                 />
               </div>
