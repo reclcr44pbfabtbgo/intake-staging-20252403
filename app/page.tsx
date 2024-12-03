@@ -209,6 +209,7 @@ export default function Home() {
       }
       if (digitCount === 10) { } else {
         setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
+        return;
       }
     }
     
@@ -224,11 +225,12 @@ export default function Home() {
       let pickupdigitCount = formData.pickupPhoneNumber.replace(/\D/g, "").length;
 
       if (!pickupphoneRegex.test(formData.pickupPhoneNumber)) {
-        setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
+        setSubmitError('Invalid phone number format. Use E.164 format, e.g., +1234567890.');
         return;
       }
       if (pickupdigitCount === 10) { } else {
-        setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
+        setSubmitError('Invalid phone number format. Use E.164 format, e.g., +1234567890.');
+        return;
       }
     }
     if (validateStep(step)) {
