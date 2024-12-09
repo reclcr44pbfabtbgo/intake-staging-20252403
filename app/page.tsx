@@ -11,7 +11,6 @@ interface FormData {
   lastName: string;
   dateOfBirth: string;
   email: string;
-  emailAddress: string;
   phoneNumber: string;
   treatmentType: string;
   primaryIssue: string;
@@ -52,7 +51,6 @@ const initialFormState: FormData = {
   lastName: '',
   dateOfBirth: '',
   email: '',
-  emailAddress: '',
   phoneNumber: '',
   treatmentType: '',
   primaryIssue: '',
@@ -167,7 +165,7 @@ export default function Home() {
   const validateStep = (currentStep: number): boolean => {
     switch (currentStep) {
       case 1:
-        return !!formData.insuranceProvider && !!formData.policyNumber && !!formData.phoneNumber && !!formData.emailAddress;
+        return !!formData.insuranceProvider && !!formData.policyNumber && !!formData.phoneNumber;
       case 2:
         return !!formData.email && !!formData.treatmentType && !!formData.primaryIssue;
       case 3:
@@ -418,22 +416,6 @@ export default function Home() {
                 name="lastName"
                 id="lastName"
                 value={formData.lastName}
-                onChange={handleChange}
-                className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
-              />
-            </div>
-          </div>
-
-          <div className="sm:col-span-3">
-            <label htmlFor="emailAddress" className="block text-sm font-medium text-gray-800">
-              Email Address
-            </label>
-            <div className="mt-1">
-              <input
-                type="email"
-                name="emailAddress"
-                id="emailAddress"
-                value={formData.emailAddress}
                 onChange={handleChange}
                 className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
               />
