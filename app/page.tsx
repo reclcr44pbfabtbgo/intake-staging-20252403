@@ -716,7 +716,7 @@ export default function Home() {
 
   const renderMedicalNeeds = () => {
     const chronicConditions = [
-      "AFIB", "Autoimmune Disorder", "Cancer", "Cirrhosis", "Coughing of blood", 
+      "AFIB", "Autoimmune Disorder", "Cancer", "Cirrhosis", "Coughing of blood", "Diabetes", 
       "Epilepsy", "Heart attacks", "Hemophilia", "Jaundice", "Kidney Stones", 
       "Lyme Disease", "MRSA", "Narcolepsy", "Neurosurgery", "Open Surgical Wounds", 
       "Pancreatitis", "Pericarditis", "Pregnancy", "Rocky Mountain Spotted Fever", 
