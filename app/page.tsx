@@ -56,7 +56,7 @@ const initialFormState: FormData = {
   primaryIssue: '',
   usedLast30Days: 'Yes',
   experiencingWithdrawal: 'Yes',
-  mentalHealthConditions: [] as string[],
+  mentalHealthConditions: [],
   suicideAttempts: 'No',
   activelyPsychotic: 'No',
   canManageDailyActivities: 'Yes',
@@ -118,6 +118,52 @@ export default function Home() {
   const [submitMessage, setSubmitMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
   const [triggerMessage, settriggerMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
   const [vobMessage, setVOBMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
+
+  const allChronicConditions = [
+    { name: "AFIB", checked: false },
+    { name: "Autoimmune Disorder", checked: false },
+    { name: "Cancer", checked: false },
+    { name: "Cirrhosis", checked: false },
+    { name: "Coughing of blood", checked: false },
+    { name: "Diabetes", checked: false },
+    { name: "Epilepsy", checked: false },
+    { name: "Heart attacks", checked: false },
+    { name: "Hemophilia", checked: false },
+    { name: "Jaundice", checked: false },
+    { name: "Kidney Stones", checked: false },
+    { name: "Lyme Disease", checked: false },
+    { name: "MRSA", checked: false },
+    { name: "Narcolepsy", checked: false },
+    { name: "Neurosurgery", checked: false },
+    { name: "Open Surgical Wounds", checked: false },
+    { name: "Pancreatitis", checked: false },
+    { name: "Pregnancy", checked: false },
+    { name: "Rocky Mountain Spotted Fever", checked: false },
+    { name: "Shingles", checked: false },
+    { name: "Spina Bifida", checked: false },
+    { name: "Staph Infection", checked: false },
+    { name: "Traumatic Brain Injury", checked: false },
+    { name: "Uncontrolled Seizures", checked: false },
+    { name: "Uncontrolled Vomiting", checked: false },
+    { name: "Vertigo", checked: false },
+  ];
+
+  const allMentalHealthConditions = [
+    { name: "Depression", checked: false },
+    { name: "Anxiety", checked: false },
+    { name: "Bipolar", checked: false },
+    { name: "PTSD", checked: false },
+    { name: "Borderline Personality Disorder", checked: false },
+    { name: "Explosive Disorder", checked: false },
+    { name: "Schizoaffective Disorder", checked: false },
+    { name: "Schizophrenia", checked: false },
+    { name: "Dissociative Disorder", checked: false },
+    { name: "ADHD", checked: false },
+    { name: "Autism", checked: false },
+  ];
+
+  const [ChronicConditions, setChronicConditions] = useState(allChronicConditions);
+  const [MentalHealthConditions, setMentalHealthConditions] = useState(allMentalHealthConditions);
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -318,6 +364,23 @@ export default function Home() {
       </div>
     );
   };
+  
+  const Checkbox = ({ isChecked, label, checkHandler, index, id }) => {
+    return (
+      <div key={label} className="flex items-center">
+        <input
+          type="checkbox"
+          id={`${id}-${index}`}
+          name={id}
+          checked={isChecked}
+          onChange={checkHandler}
+          value={label}
+          className="h-4 w-4 rounded border-gray-400 text-yellow-500 focus:ring-yellow-500"
+        />
+        <label htmlFor={`${id}-${index}`} className="ml-2 block text-sm font-medium text-gray-800">{label}</label>
+      </div>
+    )
+  }
 
   const renderCoverageCheck = () => {
     return (
@@ -637,6 +700,15 @@ export default function Home() {
   };
 
   const renderMentalHealth = () => {
+    const updateCheckStatus = index => {
+      setMentalHealthConditions(
+        MentalHealthConditions.map((mentalHealthCondition, currentIndex) =>
+          currentIndex === index
+            ? { ...mentalHealthCondition, checked: !mentalHealthCondition.checked }
+            : mentalHealthCondition
+        )
+      )
+    }
     return (
       <>
         <h2 className="text-lg font-medium text-gray-900">Mental Health History</h2>
@@ -647,21 +719,15 @@ export default function Home() {
           <div className="sm:col-span-6">
             <h3 className="text-sm font-semibold text-gray-800">Do you have a history of any of the following mental health conditions? Select all that apply:</h3>
             <div className="mt-2 space-y-2">
-              {['ADHD', 'Autism', 'Anxiety', 'Depression', 'Bipolar', 'Schizophrenia', 'Schizoaffective Disorder', 'PTSD', 'Borderline Personality Disorder', 'Dissociative Identity Disorder', 'Eating Disorder', 'None of the above'].map((condition) => (
-                <div key={condition} className="flex items-center">
-                  <input
-                    id={condition}
-                    name="mentalHealthConditions"
-                    type="checkbox"
-                    value={condition}
-                    checked={formData.mentalHealthConditions.includes(condition)}
-                    onChange={handleChange}
-                    className="h-4 w-4 rounded border-gray-400 text-yellow-500 focus:ring-yellow-500"
-                  />
-                  <label htmlFor={condition} className="ml-2 block text-sm font-medium text-gray-800">
-                    {condition}
-                  </label>
-                </div>
+              {MentalHealthConditions.map((mentalHealthCondition, index) => (
+                <Checkbox
+                  key={mentalHealthCondition.name}
+                  isChecked={mentalHealthCondition.checked}
+                  checkHandler={() => updateCheckStatus(index)}
+                  label={mentalHealthCondition.name}
+                  index={index}
+                  id="mentalHealthConditions"
+                />
               ))}
             </div>
           </div>
@@ -715,14 +781,15 @@ export default function Home() {
   };
 
   const renderMedicalNeeds = () => {
-    const chronicConditions = [
-      "AFIB", "Autoimmune Disorder", "Cancer", "Cirrhosis", "Coughing of blood", "Diabetes", 
-      "Epilepsy", "Heart attacks", "Hemophilia", "Jaundice", "Kidney Stones", 
-      "Lyme Disease", "MRSA", "Narcolepsy", "Neurosurgery", "Open Surgical Wounds", 
-      "Pancreatitis", "Pericarditis", "Pregnancy", "Rocky Mountain Spotted Fever", 
-      "Shingles", "Spina Bifida", "Staph Infection", "Traumatic Brain Injury", 
-      "Uncontrolled Seizures", "Uncontrolled Vomiting", "Vertigo"
-    ];
+    const updateCheckStatus = index => {
+      setChronicConditions(
+        ChronicConditions.map((chronicCondition, currentIndex) =>
+          currentIndex === index
+            ? { ...chronicCondition, checked: !chronicCondition.checked }
+            : chronicCondition
+        )
+      )
+    }
 
     return (
       <>
@@ -764,21 +831,15 @@ export default function Home() {
           <div className="sm:col-span-6">
             <h3 className="text-sm font-semibold text-gray-800">Do you currently have any of the following serious, chronic medical conditions? Select only if you currently have the condition:</h3>
             <div className="mt-2 space-y-2">
-              {chronicConditions.map((condition) => (
-                <div key={condition} className="flex items-center">
-                  <input
-                    id={`chronicCondition-${condition}`}
-                    name="chronicConditions"
-                    type="checkbox"
-                    value={condition}
-                    checked={formData.chronicConditions.includes(condition)}
-                    onChange={handleChange}
-                    className="h-4 w-4 rounded border-gray-400 text-yellow-500 focus:ring-yellow-500"
-                  />
-                  <label htmlFor={`chronicCondition-${condition}`} className="ml-2 block text-sm font-medium text-gray-800">
-                    {condition}
-                  </label>
-                </div>
+              {ChronicConditions.map((chronicCondition, index) => (
+                <Checkbox
+                  key={chronicCondition.name}
+                  isChecked={chronicCondition.checked}
+                  checkHandler={() => updateCheckStatus(index)}
+                  label={chronicCondition.name}
+                  index={index}
+                  id="chronicConditions"
+                />
               ))}
             </div>
           </div>
@@ -881,7 +942,6 @@ export default function Home() {
                   value={formData.admissionDate}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
-                  min={today}
                   required
                 />
               </div>
@@ -938,7 +998,6 @@ export default function Home() {
                   value={formData.pickupDate}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
-                  min={today}
                   required
                 />
               </div>
