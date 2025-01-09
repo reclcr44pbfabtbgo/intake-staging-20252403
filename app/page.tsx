@@ -33,8 +33,10 @@ interface FormData {
   pickupPhoneNumber: string;
   travelArrangements: string;
   pickupDate: string;
+  pickupTimeMT: string;
   pickupTime: string;
   admissionDate: string;
+  admissionTimeMT: string;
   admissionTime: string;
   utm_campaign: string;
   utm_medium: string;
@@ -73,8 +75,10 @@ const initialFormState: FormData = {
   pickupPhoneNumber: '',
   travelArrangements: '',
   pickupDate: '',
+  pickupTimeMT: '',
   pickupTime: '',
   admissionDate: '',
+  admissionTimeMT: '',
   admissionTime: '',
   utm_campaign: '',
   utm_medium: '',
@@ -174,6 +178,22 @@ export default function Home() {
     // Reset the otherInsuranceProvider if the user changes insuranceProvider
     if (name === 'insuranceProvider' && value !== 'other') {
       setFormData(prevState => ({ ...prevState, otherInsuranceProvider: '' }));
+    }
+
+    if (name === 'pickupTimeMT') {
+      let [hours, minutes] = value.split(":").map(Number);
+      let period = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12 || 12;
+      let newValue = `${hours}:${minutes.toString().padStart(2, "0")} ${period}`;
+      setFormData(prevState => ({ ...prevState, ['pickupTime']: newValue }));
+    }
+
+    if (name === 'admissionTimeMT') {
+      let [hours, minutes] = value.split(":").map(Number);
+      let period = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12 || 12;
+      let newValue = `${hours}:${minutes.toString().padStart(2, "0")} ${period}`;
+      setFormData(prevState => ({ ...prevState, ['admissionTime']: newValue }));
     }
 
     if (name === 'treatmentType') {
@@ -954,6 +974,15 @@ export default function Home() {
               <div className="mt-1">
                 <input
                   type="time"
+                  name="admissionTimeMT"
+                  id="admissionTimeMT"
+                  value={formData.admissionTimeMT}
+                  onChange={handleChange}
+                  className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
+                  required
+                />
+                <input
+                  type="hidden"
                   name="admissionTime"
                   id="admissionTime"
                   value={formData.admissionTime}
@@ -1010,6 +1039,15 @@ export default function Home() {
               <div className="mt-1">
                 <input
                   type="time"
+                  name="pickupTimeMT"
+                  id="pickupTimeMT"
+                  value={formData.pickupTimeMT}
+                  onChange={handleChange}
+                  className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
+                  required
+                />
+                <input
+                  type="hidden"
                   name="pickupTime"
                   id="pickupTime"
                   value={formData.pickupTime}
