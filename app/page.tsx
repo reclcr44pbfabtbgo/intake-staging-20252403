@@ -33,10 +33,10 @@ interface FormData {
   pickupPhoneNumber: string;
   travelArrangements: string;
   pickupDate: string;
-  pickupTimeMT: string;
+  pTMT: string;
   pickupTime: string;
   admissionDate: string;
-  admissionTimeMT: string;
+  aTMT: string;
   admissionTime: string;
   utm_campaign: string;
   utm_medium: string;
@@ -75,10 +75,10 @@ const initialFormState: FormData = {
   pickupPhoneNumber: '',
   travelArrangements: '',
   pickupDate: '',
-  pickupTimeMT: '',
+  pTMT: '',
   pickupTime: '',
   admissionDate: '',
-  admissionTimeMT: '',
+  aTMT: '',
   admissionTime: '',
   utm_campaign: '',
   utm_medium: '',
@@ -87,9 +87,11 @@ const initialFormState: FormData = {
 };
 
 export default function Home() {
-  
-
   const today = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const threeDaysLater = new Date(now);
+  threeDaysLater.setDate(now.getDate() + 3);
+  const now3days = threeDaysLater.toISOString().split('T')[0];
 
   const queryParams = useMemo(() => {
     if (typeof window !== 'undefined') {
@@ -180,20 +182,29 @@ export default function Home() {
       setFormData(prevState => ({ ...prevState, otherInsuranceProvider: '' }));
     }
 
-    if (name === 'pickupTimeMT') {
+    if (name === 'pTMT') {
       let [hours, minutes] = value.split(":").map(Number);
       let period = hours >= 12 ? "PM" : "AM";
       hours = hours % 12 || 12;
       let newValue = `${hours}:${minutes.toString().padStart(2, "0")} ${period}`;
-      setFormData(prevState => ({ ...prevState, ['pickupTime']: newValue }));
+      setFormData(prevState => ({ ...prevState, ['pickupTime']: newValue, ['admissionTime']: '', ['aTMT']: '', ['admissionDate']: '' }));
     }
 
-    if (name === 'admissionTimeMT') {
+    if (name === 'aTMT') {
       let [hours, minutes] = value.split(":").map(Number);
       let period = hours >= 12 ? "PM" : "AM";
       hours = hours % 12 || 12;
       let newValue = `${hours}:${minutes.toString().padStart(2, "0")} ${period}`;
-      setFormData(prevState => ({ ...prevState, ['admissionTime']: newValue }));
+      setFormData(prevState => ({ ...prevState, ['admissionTime']: newValue, ['pickupTime']: '', ['pTMT']: '', ['pickupDate']: '' }));
+    }
+
+    if (name === 'travelArrangements'){
+      if( value === 'Yes' ){
+        setFormData(prevState => ({ ...prevState, ['pickupTime']: '', ['pTMT']: '', ['pickupDate']: '' }));
+      }
+      if( value === 'No' ){
+        setFormData(prevState => ({ ...prevState, ['admissionTime']: '', ['aTMT']: '', ['admissionDate']: '' }));
+      }
     }
 
     if (name === 'treatmentType') {
@@ -214,6 +225,13 @@ export default function Home() {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
+
+
+
+      console.log('handleVOBSubmit:');
+      console.log(formData);
+
+
       setFormData(prevState => ({
         ...prevState,
         vobResult: data.vob_result,
@@ -277,6 +295,9 @@ export default function Home() {
     if (step === 8 && formData.travelArrangements === 'No') {
       const phoneRegex = /^\+?[1-9]\d{1,14}$/;
       const addressPattern = /[A-Za-z].*\d|\d.*[A-Za-z]/;
+      const PDtoday = new Date();
+      const pickupDate = new Date(formData.pickupDate);
+
       if (!addressPattern.test(formData.pickupAddress.trim())) {
         settriggerMessage({ type: 'error', text: 'Please enter a valid pickup address.' });
         return;
@@ -288,7 +309,28 @@ export default function Home() {
         settriggerMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
         return;
       }
+      const PDdiffInTime = PDtoday.getTime() - pickupDate.getTime();
+      const PDdiffInDays = Math.ceil(PDdiffInTime / (1000 * 60 * 60 * 24));
+  
+      if (PDdiffInDays > 3) {
+        settriggerMessage({ type: 'error', text: 'Pickup date cannot be more than 3 days out.' });
+        return;
+      }
     }
+    
+    if (step === 8 && formData.travelArrangements === 'Yes') {
+      const ADtoday = new Date();
+      const admissionDate = new Date(formData.admissionDate);
+  
+      const ADdiffInTime = ADtoday.getTime() - admissionDate.getTime();
+      const ADdiffInDays = Math.ceil(ADdiffInTime / (1000 * 60 * 60 * 24));
+  
+      if (ADdiffInDays > 3) {
+        settriggerMessage({ type: 'error', text: 'Admission date cannot be more than 3 days out.' });
+        return;
+      }
+    }
+
     if (validateStep(step)) {
       if (step < 5) {
         setStep(step + 1);
@@ -305,6 +347,11 @@ export default function Home() {
             },
             body: JSON.stringify(formData),
           });
+
+          console.log('handleSubmit step5:');
+          console.log(formData);
+
+
           const data = await response.json();
           setFormData(prevState => ({
             ...prevState,
@@ -329,6 +376,10 @@ export default function Home() {
             },
             body: JSON.stringify(formData),
           });
+          
+          console.log('handleSubmit step8:');
+          console.log(formData);
+
           const data = await response.json();
           if (step === 6 && data.next_step === 'schedule_admission') {
             setStep(8);
@@ -887,6 +938,7 @@ export default function Home() {
                   value={option}
                   checked={formData.startTreatment === option}
                   onChange={handleChange}
+                  
                   className="h-4 w-4 border-gray-400 text-yellow-500 focus:ring-yellow-500"
                 />
                 <label htmlFor={`startTreatment-${option.toLowerCase().replace(/\s+/g, '-')}`} className="ml-2 block text-sm font-medium text-gray-800">
@@ -960,6 +1012,8 @@ export default function Home() {
                   name="admissionDate"
                   id="admissionDate"
                   value={formData.admissionDate}
+                  min={today}
+                  max={now3days}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
                   required
@@ -974,9 +1028,9 @@ export default function Home() {
               <div className="mt-1">
                 <input
                   type="time"
-                  name="admissionTimeMT"
-                  id="admissionTimeMT"
-                  value={formData.admissionTimeMT}
+                  name="aTMT"
+                  id="aTMT"
+                  value={formData.aTMT}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
                   required
@@ -1025,6 +1079,8 @@ export default function Home() {
                   name="pickupDate"
                   id="pickupDate"
                   value={formData.pickupDate}
+                  min={today}
+                  max={now3days}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
                   required
@@ -1039,9 +1095,9 @@ export default function Home() {
               <div className="mt-1">
                 <input
                   type="time"
-                  name="pickupTimeMT"
-                  id="pickupTimeMT"
-                  value={formData.pickupTimeMT}
+                  name="pTMT"
+                  id="pTMT"
+                  value={formData.pTMT}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
                   required
