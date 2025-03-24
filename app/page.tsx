@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, ArrowRight, Check, Lock } from "lucide-react";
 
-interface FormData {
+interface FormData { 
   location: string;
   insuranceProvider: string;
   policyNumber: string;
@@ -279,15 +279,60 @@ export default function Home() {
     }
   };
 
+  const isRepeatedPattern = (str) => {
+    const len = str.length;
+    for (let segLen = 1; segLen <= Math.floor(len / 2); segLen++) {
+      if (len % segLen === 0) {
+        const segment = str.substring(0, segLen);
+        if (segment.repeat(len / segLen) === str) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (step === 1) {
       const phoneRegex = /^\+?[1-9]\d{1,14}$/;
       let digitCount = formData.phoneNumber.replace(/\D/g, "").length;
+      let policyId = formData.policyNumber;
+      let phone = formData.phoneNumber;
+      let userName = formData.firstName;
+      let dob = formData.dateOfBirth;
+      const lowerPolicy = policyId.toLowerCase();
+  
 
       if (!phoneRegex.test(formData.phoneNumber) || digitCount > 10) {
         setSubmitMessage({ type: 'error', text: 'Invalid phone number format. Use E.164 format, e.g., +1234567890.' });
+        return;
+      }
+      if (policyId.length < 7 || policyId.length > 22) {
+        setSubmitMessage({ type: 'error', text: 'Policy Number must be between 7 and 22 characters.' });
+        return;
+      }
+      if (!/^[A-Za-z0-9]+$/.test(policyId) ) {
+        setSubmitMessage({ type: 'error', text: 'Policy Number must contain only letters and numbers (no special characters).' });
+        return;
+      }
+      if (!/[A-Za-z]/.test(policyId) || !/[0-9]/.test(policyId)) {
+        setSubmitMessage({ type: 'error', text: 'Policy ID must include both letters and numbers.' });
+        return;
+      }
+      if (new Set(policyId).size === 1) {
+        setSubmitMessage({ type: 'error', text: 'Policy Number cannot be a single repeating character.' });
+        return;
+      }
+      if (isRepeatedPattern(policyId)) {
+        setSubmitMessage({ type: 'error', text: 'Policy Number appears to be a repeated pattern and is invalid.' });
+        return;
+      }
+      if (
+        userName && lowerPolicy === userName.toLowerCase() || phone && policyId === phone || dob && policyId === dob  // Assuming dob is formatted as a string that can be directly compared.
+      ) {
+        setSubmitMessage({ type: 'error', text: 'Policy Number cannot be your name, phone number, or date of birth.' });
         return;
       }
     }
@@ -521,6 +566,7 @@ export default function Home() {
                 onChange={handleChange}
                 className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
               />
+              <small>Please enter your accurate policy number. Incorrect or fake numbers cannot be verified, and coverage checks may be delayed.</small>
             </div>
           </div>
 
