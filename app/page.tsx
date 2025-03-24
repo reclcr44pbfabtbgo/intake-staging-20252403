@@ -318,7 +318,7 @@ export default function Home() {
         return;
       }
       if (!/[A-Za-z]/.test(policyId) || !/[0-9]/.test(policyId)) {
-        setSubmitMessage({ type: 'error', text: 'Policy ID must include both letters and numbers.' });
+        setSubmitMessage({ type: 'error', text: 'Policy Number must include both letters and numbers.' });
         return;
       }
       if (new Set(policyId).size === 1) {
@@ -557,7 +557,7 @@ export default function Home() {
             <label htmlFor="policyNumber" className="block text-sm font-medium text-gray-800">
               Policy Number
             </label>
-            <div className="mt-1">
+            <div className="mt-1 pos-rel">
               <input
                 type="text"
                 name="policyNumber"
@@ -566,7 +566,7 @@ export default function Home() {
                 onChange={handleChange}
                 className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
               />
-              <small>Please enter your accurate policy number. Incorrect or fake numbers cannot be verified, and coverage checks may be delayed.</small>
+              <span class="text-xxs text-gray-600 pos-abs">Please enter your accurate policy number. Incorrect or fake numbers cannot be verified, and coverage checks may be delayed.</span>
             </div>
           </div>
 
