@@ -566,7 +566,7 @@ export default function Home() {
                 onChange={handleChange}
                 className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
               />
-              <span class="text-xxs text-gray-600 pos-abs">Please enter your accurate policy number. Incorrect or fake numbers cannot be verified, and coverage checks may be delayed.</span>
+              <span className="text-xxs text-gray-600 pos-abs">Please enter your accurate policy number. Incorrect or fake numbers cannot be verified, and coverage checks may be delayed.</span>
             </div>
           </div>
 
