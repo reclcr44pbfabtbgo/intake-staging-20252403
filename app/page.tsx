@@ -1143,23 +1143,18 @@ export default function Home() {
                 Preferred Pickup Time
               </label>
               <div className="mt-4 dis-flex-gap">
-                {['Morning', 'Afternoon', 'Evening'].map((option) => (
-                  <div key={option} className="flex items-center">
-                    <input
-                      id={`pickupTime-${option.toLowerCase().replace(/\s+/g, '-')}`}
-                      name="pickupTime"
-                      type="radio"
-                      value={option}
-                      checked={formData.pickupTime === option}
-                      onChange={handleChange}
-                      
-                      className="h-4 w-4 border-gray-400 text-yellow-500 focus:ring-yellow-500"
-                    />
-                    <label htmlFor={`pickupTime-${option.toLowerCase().replace(/\s+/g, '-')}`} className="ml-2 block text-sm font-medium text-gray-800">
-                      {option}
-                    </label>
-                  </div>
-                ))}
+              <select
+                id="pickupTime"
+                name="pickupTime"
+                value={formData.pickupTime}
+                onChange={handleChange}
+                required
+                className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
+              >
+                <option value="Morning">Morning</option>
+                <option value="Afternoon">Afternoon</option>
+                <option value="Evening">Evening</option>
+              </select>
               </div>
             </div>
 
