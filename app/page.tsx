@@ -33,7 +33,6 @@ interface FormData {
   pickupPhoneNumber: string;
   travelArrangements: string;
   pickupDate: string;
-  pTMT: string;
   pickupTime: string;
   admissionDate: string;
   aTMT: string;
@@ -75,7 +74,6 @@ const initialFormState: FormData = {
   pickupPhoneNumber: '',
   travelArrangements: '',
   pickupDate: '',
-  pTMT: '',
   pickupTime: '',
   admissionDate: '',
   aTMT: '',
@@ -182,25 +180,17 @@ export default function Home() {
       setFormData(prevState => ({ ...prevState, otherInsuranceProvider: '' }));
     }
 
-    if (name === 'pTMT') {
-      let [hours, minutes] = value.split(":").map(Number);
-      let period = hours >= 12 ? "PM" : "AM";
-      hours = hours % 12 || 12;
-      let newValue = `${hours}:${minutes.toString().padStart(2, "0")} ${period}`;
-      setFormData(prevState => ({ ...prevState, ['pickupTime']: newValue, ['admissionTime']: '', ['aTMT']: '', ['admissionDate']: '' }));
-    }
-
     if (name === 'aTMT') {
       let [hours, minutes] = value.split(":").map(Number);
       let period = hours >= 12 ? "PM" : "AM";
       hours = hours % 12 || 12;
       let newValue = `${hours}:${minutes.toString().padStart(2, "0")} ${period}`;
-      setFormData(prevState => ({ ...prevState, ['admissionTime']: newValue, ['pickupTime']: '', ['pTMT']: '', ['pickupDate']: '' }));
+      setFormData(prevState => ({ ...prevState, ['admissionTime']: newValue, ['pickupTime']: '', ['pickupDate']: '' }));
     }
 
     if (name === 'travelArrangements'){
       if( value === 'Yes' ){
-        setFormData(prevState => ({ ...prevState, ['pickupTime']: '', ['pTMT']: '', ['pickupDate']: '' }));
+        setFormData(prevState => ({ ...prevState, ['pickupTime']: '', ['pickupDate']: '' }));
       }
       if( value === 'No' ){
         setFormData(prevState => ({ ...prevState, ['admissionTime']: '', ['aTMT']: '', ['admissionDate']: '' }));
@@ -421,12 +411,14 @@ export default function Home() {
             },
             body: JSON.stringify(formData),
           });
-          
+
           console.log('handleSubmit step8:');
           console.log(formData);
 
           const data = await response.json();
-          if (step === 6 && data.next_step === 'schedule_admission') {
+          if (step === 6 && formData.startTreatment === 'Immediately') {
+            setStep(8);
+          } if (step === 6 && data.next_step === 'schedule_admission') {
             setStep(8);
           } else {
             setIsSubmitted(true);
@@ -1013,6 +1005,16 @@ export default function Home() {
     const minDate = new Date();
     minDate.setMinutes(minDate.getMinutes() + 30);
     const minTimeString = minDate.toTimeString().slice(0, 5);
+    var nowyearsordays;
+
+    if (formData.startTreatment === 'Within the next 24-48 hours') {
+      const threeYearsLater = new Date(now);
+      threeYearsLater.setDate(now.getDate() + 3);
+      const now3years = threeYearsLater.toISOString().split('T')[0];
+      nowyearsordays = now3years;
+    } else{
+      nowyearsordays = now3days;
+    }
 
     return (
       <>
@@ -1059,7 +1061,7 @@ export default function Home() {
                   id="admissionDate"
                   value={formData.admissionDate}
                   min={today}
-                  max={now3days}
+                  max={nowyearsordays}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
                   required
@@ -1126,7 +1128,7 @@ export default function Home() {
                   id="pickupDate"
                   value={formData.pickupDate}
                   min={today}
-                  max={now3days}
+                  max={nowyearsordays}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
                   required
@@ -1139,24 +1141,23 @@ export default function Home() {
                 Preferred Pickup Time
               </label>
               <div className="mt-1">
-                <input
-                  type="time"
-                  name="pTMT"
-                  id="pTMT"
-                  value={formData.pTMT}
-                  onChange={handleChange}
-                  className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
-                  required
-                />
-                <input
-                  type="hidden"
-                  name="pickupTime"
-                  id="pickupTime"
-                  value={formData.pickupTime}
-                  onChange={handleChange}
-                  className="block w-full rounded-md border border-gray-400 bg-white px-3 py-2 text-base text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 sm:text-sm"
-                  required
-                />
+                {['Morning', 'Afternoon', 'Evening'].map((option) => (
+                  <div key={option} className="flex items-center">
+                    <input
+                      id={`pickupTime-${option.toLowerCase().replace(/\s+/g, '-')}`}
+                      name="pickupTime"
+                      type="radio"
+                      value={option}
+                      checked={formData.pickupTime === option}
+                      onChange={handleChange}
+                      
+                      className="h-4 w-4 border-gray-400 text-yellow-500 focus:ring-yellow-500"
+                    />
+                    <label htmlFor={`pickupTime-${option.toLowerCase().replace(/\s+/g, '-')}`} className="ml-2 block text-sm font-medium text-gray-800">
+                      {option}
+                    </label>
+                  </div>
+                ))}
               </div>
             </div>
 
