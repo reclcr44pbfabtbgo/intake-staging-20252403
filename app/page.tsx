@@ -1009,8 +1009,9 @@ export default function Home() {
     var nowyearsordays;
 
     if (formData.startTreatment === 'In 3 days or more') {
+      const now = new Date();
       const threeYearsLater = new Date(now);
-      threeYearsLater.setDate(now.getDate() + 3);
+      threeYearsLater.setFullYear(now.getFullYear() + 3);
       const now3years = threeYearsLater.toISOString().split('T')[0];
       nowyearsordays = now3years;
     } else{
