@@ -383,7 +383,7 @@ export default function Home() {
             body: JSON.stringify(formData),
           });
 
-          console.log('handleSubmit step5:');
+          console.log('handleSubmit step: ' + step);
           console.log(formData);
 
 
@@ -412,12 +412,13 @@ export default function Home() {
             body: JSON.stringify(formData),
           });
 
-          console.log('handleSubmit step8:');
+          console.log('handleSubmit step: ' + step);
           console.log(formData);
 
           const data = await response.json();
           if (step === 6 && formData.startTreatment === 'Immediately') {
             setStep(8);
+            console.log('Immediately step 6');
           } if (step === 6 && data.next_step === 'schedule_admission') {
             setStep(8);
           } else {
@@ -1140,7 +1141,7 @@ export default function Home() {
               <label htmlFor="pickupTime" className="block text-sm font-medium text-gray-800">
                 Preferred Pickup Time
               </label>
-              <div className="mt-1">
+              <div className="mt-4 dis-flex-gap">
                 {['Morning', 'Afternoon', 'Evening'].map((option) => (
                   <div key={option} className="flex items-center">
                     <input
