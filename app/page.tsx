@@ -417,7 +417,7 @@ export default function Home() {
 
           const data = await response.json();
           if (step === 6 && formData.startTreatment === 'Immediately') {
-            setStep(8);
+            setIsSubmitted(true);
             console.log('Immediately step 6');
           } if (step === 6 && data.next_step === 'schedule_admission') {
             setStep(8);
@@ -1008,7 +1008,7 @@ export default function Home() {
     const minTimeString = minDate.toTimeString().slice(0, 5);
     var nowyearsordays;
 
-    if (formData.startTreatment === 'Within the next 24-48 hours') {
+    if (formData.startTreatment === 'In 3 days or more') {
       const threeYearsLater = new Date(now);
       threeYearsLater.setDate(now.getDate() + 3);
       const now3years = threeYearsLater.toISOString().split('T')[0];
