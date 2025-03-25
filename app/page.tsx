@@ -1142,7 +1142,7 @@ export default function Home() {
               <label htmlFor="pickupTime" className="block text-sm font-medium text-gray-800">
                 Preferred Pickup Time
               </label>
-              <div className="mt-4 dis-flex-gap">
+              <div className="mt-1">
               <select
                 id="pickupTime"
                 name="pickupTime"
